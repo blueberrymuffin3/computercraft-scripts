@@ -174,7 +174,7 @@ function home()
     backspace=function() triggerClear() end,
   }
 
-  local refreshAlarmId = nil
+  local refreshTimerId = nil
   local controlHeld = false
   local itemsList = {}
   local selectedIndex = 1
@@ -295,7 +295,7 @@ function home()
     importItems()
     updateItemsList()
     renderHome()
-    refreshAlarmId = os.setAlarm(os.time() + 1)
+    refreshTimerId = os.startTimer(os.time() + 1)
   end
 
   function triggerClear()
@@ -355,9 +355,9 @@ function home()
       renderHome()
     elseif event == "peripheral" or event == "peripheral_detach" then
       triggerRefresh()
-    elseif event == "alarm" then
-      local alarmId = eventData[2]
-      if alarmId == refreshAlarmId then
+    elseif event == "timer" then
+      local timerId = eventData[2]
+      if timerId == refreshTimerId then
         triggerRefresh()
       end
     end
