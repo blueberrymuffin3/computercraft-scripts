@@ -295,7 +295,7 @@ function home()
     importItems()
     updateItemsList()
     renderHome()
-    refreshTimerId = os.startTimer(os.time() + 1)
+    refreshTimerId = os.startTimer(20)
   end
 
   function triggerClear()
