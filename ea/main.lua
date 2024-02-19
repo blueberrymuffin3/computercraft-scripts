@@ -214,19 +214,19 @@ homeListView = listView{
   end,
   hotkeys={
     [keys.q]={
-      description="My Action",
+      description="Drop 1",
       action=triggerDropAction(1),
     },
     [keys.w]={
-      description="My Action",
+      description="Drop 16",
       action=triggerDropAction(16),
     },
     [keys.e]={
-      description="My Action",
+      description="Drop 64",
       action=triggerDropAction(64),
     },
     [keys.r]={
-      description="My Action",
+      description="Refresh and Import",
       action=triggerRefresh,
     },
   },

@@ -40,28 +40,89 @@ function ListView(config)
   local selectedIndex = 1
   local query = ""
 
+  local function writeLine(text, width, align)
+    if align == nil then
+      align = 0
+    end
+
+    local textLen = string.len(text)
+
+    local prefix = math.floor((width - textLen) * align)
+    for i=1,prefix do
+      text = " "..text
+    end
+    
+    local suffix = width - textLen - prefix
+    for i=1,suffix do
+      text = text.." "
+    end
+    
+    term.write(text)
+  end
+
+  local function renderHotkeys()
+    local width, height = term.getSize()
+  
+    local lines = {}
+    local seperator = "  "
+    local line = nil
+
+    for key, data in pairs(config.hotkeys) do
+      local keyName = keys.getName(key)
+      local entry = "ctrl-"..keyName..":"..data.description
+      if line ~= nil then
+        local newLine = line..seperator..entry
+        if string.len(newLine) > width then
+          table.insert(lines, line)
+          line = entry
+        else
+          line = newLine
+        end
+      else
+        line = entry
+      end
+    end
+
+    if line ~= nil then
+      table.insert(lines, line)
+    end
+
+    return lines
+  end
+
   local function render()
     local width, height = term.getSize()
 
     term.clear()
 
-    term.setCursorPos(1, 1)
+    -- Render header lines
+    local headerLinesN = 1
     term.setBackgroundColor(colors.white)
     term.setTextColor(colors.black)
-    print("Search: "..query.."_")
-    term.setBackgroundColor(colors.black)
-    term.setTextColor(colors.white)
+    term.setCursorPos(1, 1)
+    writeLine("Search: "..query.."_", width, 0.5)
+    
+    -- Render footer lines
+    local footerLines = renderHotkeys()
+    local footerLinesN = table.getn(footerLines)
+    term.setBackgroundColor(colors.white)
+    term.setTextColor(colors.black)
+    for i, footerLine in pairs(footerLines) do
+      term.setCursorPos(1, height - footerLinesN + i)
+      writeLine(footerLine, width, 0.5)
+    end
 
-    local iStart = selectedIndex - math.floor(height / 2)
+    local listHeight = height - headerLinesN - footerLinesN
+    local iStart = selectedIndex - math.floor(listHeight / 2)
     if iStart < 1 then
       iStart = 1
     end
-    local iEnd = iStart+height-3
-
+    local iEnd = iStart + listHeight - 1
+    term.setTextColor(colors.white)
     for i=iStart,iEnd do
-      -- local y = i-iStart + 2
-      -- term.setCursorPos(1, y)
-
+      local y = 1 + headerLinesN + i - iStart
+      term.setCursorPos(1, y)
+      
       if i == selectedIndex then
         term.setBackgroundColor(colors.blue)
       else
@@ -71,19 +132,13 @@ function ListView(config)
       local item = listFiltered[i]
   
       if item ~= nil then
-        print(config.renderListItem(item))
+        writeLine(config.renderListItem(item), width)
       else
-        print("~")
+        writeLine("~", width)
       end
     end
 
-    -- TODO: Render help from hotkeys
-    term.setBackgroundColor(colors.white)
-    term.setTextColor(colors.black)
-    term.setCursorPos(1, height-1)
-    term.write("   ctrl-r:refresh and import                       ")
-    term.setCursorPos(1, height)
-    term.write("   ctrl-q:drop 1  ctrl-w:drop 16  ctrl-e:drop 64   ")
+    -- Reset colors
     term.setBackgroundColor(colors.black)
     term.setTextColor(colors.white)
   end
@@ -135,8 +190,6 @@ function ListView(config)
     list = newList
     refreshListFiltered()
   end
-
-
 
   local keyControlDelegator = delegator{
     [keys.backspace]=function()
