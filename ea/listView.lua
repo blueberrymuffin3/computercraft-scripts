@@ -136,27 +136,7 @@ function ListView(config)
     refreshListFiltered()
   end
 
-  local function hotkeyHandler(key, ...)
-    local hotkey = config.hotkeys[key]
-    if hotkey then
-      hotkey.action(...)
-    end
-  end
 
-  config.hotkeys[keys.backspace] = {
-    action=function()
-      query = ""
-      refreshListFiltered()
-    end
-  }
-
-  local function hotkeysToHandlerMap()
-    map = {}
-    for key, hotkey in pairs(config.hotkeys) do
-      map[key] = hotkey.action
-    end
-    return map
-  end
 
   local keyControlDelegator = delegator{
     [keys.backspace]=function()
@@ -165,6 +145,15 @@ function ListView(config)
     end,
   }
 
+  local function hotkeysToHandlerMap()
+    map = {}
+    for key, hotkey in pairs(config.hotkeys) do
+      map[key] = function()
+        hotkey.action(listFiltered[selectedIndex])
+      end
+    end
+    return map
+  end
   keyControlDelegator.addHandlerMap(hotkeysToHandlerMap())
 
   local keyNoControlDelegator = delegator{
@@ -185,7 +174,7 @@ function ListView(config)
   local eventHandlerMap = {
     key=function(...)
       if controlHeld then
-        hotkeyHandler(...)
+        keyControlDelegator.handle(...)
       else
         keyNoControlDelegator.handle(...)
       end

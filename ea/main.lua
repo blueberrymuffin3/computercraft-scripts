@@ -139,28 +139,6 @@ local function importItems()
   end
 end
 
-local function triggerDropAction(ammount)
-  return function()
-    data = itemsList[selectedIndex]
-    if data == nil then
-      return
-    end
-
-    while ammount > 0 and data.total > 0 do
-      location = data.locations[1]
-      local ammountMoved = dropoffPeripheral.pullItems(location.pName, location.slot, ammount)
-      ammount = ammount - ammountMoved
-      data.total = data.total - ammountMoved
-      location.count = location.count - ammountMoved
-      if location.count == 0 then
-        table.remove(data.locations, 1)
-      end
-    end
-
-    
-  end
-end
-
 local function updateList()
   itemsList = {}
   for _, item in pairs(items) do
@@ -181,6 +159,29 @@ local function triggerRefresh()
     os.cancelTimer(refreshTimerId)
   end
   refreshTimerId = os.startTimer(20)
+end
+
+local function triggerDropAction(ammount)
+  return function(data)
+    if data == nil then
+      return
+    end
+
+    local ammountLeft = ammount
+
+    while ammountLeft > 0 and data.total > 0 do
+      location = data.locations[1]
+      local ammountMoved = dropoffPeripheral.pullItems(location.pName, location.slot, ammountLeft)
+      ammountLeft = ammountLeft - ammountMoved
+      data.total = data.total - ammountMoved
+      location.count = location.count - ammountMoved
+      if location.count == 0 then
+        table.remove(data.locations, 1)
+      end
+    end
+
+    updateList()
+  end
 end
 
 eventHandler.addHandlerMap{
