@@ -1,4 +1,4 @@
-local status, err = pcall(function() require('main') end)
+local status, err = pcall(function() require("main") end)
 
 local message
 if status then
