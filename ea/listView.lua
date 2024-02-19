@@ -1,7 +1,7 @@
 --- Config Keys:
 -- list?: table
 -- renderListItem(item): string
--- queryMatches?(query, item): boolean
+-- queryMatches(query, item): boolean
 -- compare?(a, b): boolean
 -- getItemKey?(item): any
 -- hotkeys: map from key to
@@ -10,30 +10,23 @@
 
 local eventHandler = require("eventHandler")
 local delegator = require("delegator")
+local typeCheck = require("typeCheck")
 local controlHeld = false
 
 function ListView(config)
-  for prop, default in pairs({
-    list={},
-    compare=function(a, b) return false end,
-    getItemKey=function(item) return item end,
-  }) do
-    if config[prop] == nil then
-      config[prop] = default
-    end
-  end
-
-  for prop, requiredType in pairs({
-    list="table",
-    renderListItem="function",
-    -- queryMatches="function"
-    hotkeys="table",
-  }) do
-    local actualType = type(config[prop])
-    if actualType ~= requiredType then
-      error("[ListView] config."..prop.." must be a "..requiredType..", but was a "..actualType)
-    end
-  end
+  typeCheck(config, {
+    defaults={
+      list={},
+      compare=function(a, b) return false end,
+      getItemKey=function(item) return item end,
+    },
+    types={
+      list="table",
+      renderListItem="function",
+      queryMatches="function",
+      hotkeys="table",
+    }
+  })
 
   local list = nil
   local listFiltered = {}
