@@ -86,8 +86,6 @@ function ListView(config)
   local function render()
     local width, height = term.getSize()
 
-    term.clear()
-
     -- Render header lines
     local headerLinesN = 1
     term.setBackgroundColor(colors.white)
