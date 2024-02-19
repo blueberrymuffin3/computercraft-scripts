@@ -1,10 +1,11 @@
 local eventHandler = require("eventHandler")
 local listView = require("listView")
+local timer = require("timer")
 
 local items = {}
 local allStorages = {}
 local dropoffPeripheral = nil
-local refreshTimerId = nil
+local refreshTimer
 local homeListView
 
 local function getItemKey(item)
@@ -155,11 +156,12 @@ local function triggerRefresh()
   importItems()
   updateList()
 
-  if refreshTimerId then
-    os.cancelTimer(refreshTimerId)
-  end
-  refreshTimerId = os.startTimer(20)
+  refreshTimer.start()
 end
+refreshTimer = timer{
+  action=triggerRefresh,
+  duration=20
+}
 
 local function triggerDropAction(ammount)
   return function(data)
@@ -187,11 +189,6 @@ end
 eventHandler.addHandlerMap{
   peripheral=triggerRefresh,
   peripheral_detach=triggerRefresh,
-  timer=function(timerId)
-    if timerId == refreshTimerId then
-      triggerRefresh()
-    end
-  end
 }
 
 homeListView = listView{
