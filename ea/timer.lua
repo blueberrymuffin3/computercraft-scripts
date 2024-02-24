@@ -15,23 +15,53 @@ eventHandler.addHandlerMap{
 
 return function(config)
   typeCheck(config, {
-    defaults={},
+    defaults={
+      autoStart=false,
+      autoRestart=false,
+    },
     types={
       action="function",
-      duration="number",
+      -- duration="number", -- or nil
+      -- autoStart="boolean", -- or number
+      -- autoRestart="boolean", -- or number
     },
   })
 
   local activeId = nil
 
-  return {
-    start=function()
-      if activeId ~= nil then
-        os.cancelTimer(activeId)
-        activeCallbacks[activeId] = nil
-      end
-      activeId = os.startTimer(config.duration)
-      activeCallbacks[activeId] = config.action
+  local start
+  local callback
+
+  function callback()
+    config.action()
+
+    if config.autoRestart then
+      start(config.autoRestart)
     end
+  end
+
+  function start(durationOveride)
+    local duration = config.duration
+    if type(durationOveride) == "number" then
+      duration = durationOveride
+    end
+    if duration == nil then
+      error("Either config.duration or durationOveride must be specified")
+    end
+
+    if activeId ~= nil then
+      os.cancelTimer(activeId)
+      activeCallbacks[activeId] = nil
+    end
+    activeId = os.startTimer(duration)
+    activeCallbacks[activeId] = callback
+  end
+
+  if config.autoStart then
+    start(config.autoStart)
+  end
+
+  return {
+    start=start
   }
 end

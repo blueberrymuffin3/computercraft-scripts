@@ -25,6 +25,8 @@ function ListView(config)
       renderListItem="function",
       queryMatches="function",
       hotkeys="table",
+      compare="function",
+      getItemKey="function",
     }
   })
 
