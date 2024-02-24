@@ -70,8 +70,8 @@ netMan.addMessageHandler(delegator{
     updateListView()
   end,
   getItemKey=function(item)
-    item.key
-  end
+    return item.key
+  end,
 }.handle)
 homeListView.enableEvents()
 
