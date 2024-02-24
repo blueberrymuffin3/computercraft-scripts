@@ -199,7 +199,6 @@ local function triggerRefresh()
 end
 refreshTimer = timer{
   action=triggerRefresh,
-  autoStart=1,
   autoRestart=35,
 }
 
@@ -209,7 +208,6 @@ local function triggerImport()
 end
 importTimer = timer{
   action=triggerImport,
-  autoStart=5,
   autoRestart=5,
 }
 
@@ -246,4 +244,6 @@ netMan.addMessageHandler(delegator{
   end,
 }.handle)
 netMan.sendToType("console", "itemsClear")
+refreshTimer.start(1)
+importTimer.start(2)
 eventHandler.run()
