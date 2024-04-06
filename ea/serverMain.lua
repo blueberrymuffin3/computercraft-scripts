@@ -4,6 +4,7 @@ eventHandler.schedule(function()
   local netMan = require("netMan")
   local delegator = require("delegator")
   local periodic = require("periodic")
+  local taskStatus = require("taskStatus")
 
   local items = {}
   local itemsDirtySet = {}
@@ -113,47 +114,57 @@ eventHandler.schedule(function()
   importItemsPeriodic = periodic{
     maxDelay=5,
     initialDelay=2,
-    action=function()
-      print("Importing all import")
+    action=taskStatus.wrap("Importing", function(progress)
+      print("Importing")
 
       local rescanRequired = false
+
+      local imports = {}
 
       for _, pName in ipairs(peripheral.getNames()) do
         local pMode = getPMode(pName)
 
         if pMode == "import" then
-          print("Importing", pName)
           local pWrap = peripheral.wrap(pName)
 
           for slot, stack in pairs(pWrap.list()) do
-            if stack then
-              local key = getItemKey(stack)
-              local remaining = stack.count
+            table.insert(imports, {
+              pName=pName,
+              slot=slot,
+              stack=stack,
+            })
+          end
+        end
+      end
 
-              if items[key] then
-                for _, location in pairs(items[key].locations) do
-                  if remaining == 0 then
-                    break
-                  end
+      for i, import in pairs(imports) do
+        progress(i, #import)
 
-                  local transfered = pWrap.pushItems(location.pName, slot, remaining, location.slot)
-                  remaining = remaining - transfered
-                  location.count = location.count + transfered
-                  items[key].total = items[key].total + transfered
-                  itemsDirtySet[key] = true
-                end
-              end
+        local pName = import.pName
+        local slot = import.slot
+        local stack = import.stack
+        local key = getItemKey(stack)
+        local remaining = stack.count
 
-              if remaining > 0 then
-                for _, storagePName in pairs(allStorages) do
-                  local transfered = pWrap.pushItems(storagePName, slot)
-                  remaining = remaining - transfered
-                  rescanRequired = true
-                end
-              end
-            else
-              table.insert(emptySlots, { pName=pName, slot=slot })
+        if items[key] then
+          for _, location in pairs(items[key].locations) do
+            if remaining == 0 then
+              break
             end
+
+            local transfered = peripheral.call(pName, "pushItems", location.pName, slot, remaining, location.slot)
+            remaining = remaining - transfered
+            location.count = location.count + transfered
+            items[key].total = items[key].total + transfered
+            itemsDirtySet[key] = true
+          end
+        end
+
+        if remaining > 0 then
+          for _, storagePName in pairs(allStorages) do
+            local transfered = peripheral.call(pName, "pushItems", storagePName, slot)
+            remaining = remaining - transfered
+            rescanRequired = true
           end
         end
       end
@@ -163,7 +174,7 @@ eventHandler.schedule(function()
       else
         updateListPeriodic.trigger()
       end
-    end,
+    end),
   }
 
   updateListPeriodic = periodic{

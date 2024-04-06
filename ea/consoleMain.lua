@@ -1,4 +1,5 @@
 local eventHandler = require("eventHandler")
+local taskStatus = require("taskStatus")
 
 eventHandler.schedule(function()
   local netMan = require("netMan")

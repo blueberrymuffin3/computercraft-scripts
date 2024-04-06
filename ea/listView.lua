@@ -11,6 +11,8 @@
 local eventHandler = require("eventHandler")
 local delegator = require("delegator")
 local typeCheck = require("typeCheck")
+local taskStatusDisplay = require("taskStatusDisplay")
+
 local controlHeld = false
 
 function ListView(config)
@@ -131,6 +133,8 @@ function ListView(config)
       end
     end
 
+    taskStatusDisplay.render()
+
     -- Reset colors
     term.setBackgroundColor(colors.black)
     term.setTextColor(colors.white)
@@ -237,6 +241,7 @@ function ListView(config)
     end,
     mouse_scroll=function(direction) setSelectedIndex(selectedIndex + direction) end,
     term_resize=render,
+    tasks_changed=render,
   }
 
   setList(config.list)
