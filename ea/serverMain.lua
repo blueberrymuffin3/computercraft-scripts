@@ -27,8 +27,10 @@ eventHandler.schedule(function()
   local function getPMode(pName)
     if string.find(pName, "create:item_vault_") == 1 then
       return "storage"
-    -- elseif string.find(pName, "minecraft:chest_") == 1 then
-    --   return "storage"
+    elseif string.find(pName, "minecraft:chest_") == 1 then
+      return "storage"
+    elseif string.find(pName, "charm:.+_chest") == 1 then
+      return "storage"
     elseif string.find(pName, "botania:open_crate_") == 1 then
       return "output"
     elseif peripheral.hasType(pName, "inventory") then
