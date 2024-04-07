@@ -7,6 +7,7 @@ else
     print("Program exited with error: \n" .. err)
     print()
     print("Sending error report to admin")
+    sleep(1) -- Allow quick user to cancel message
     
     local secrets = require("secrets")
     local body = {
@@ -27,6 +28,6 @@ else
     end
 end
 
-print("Restarting in 3 seconds")
-sleep(3)
+print("Restarting in 2 seconds")
+sleep(2)
 os.reboot()
