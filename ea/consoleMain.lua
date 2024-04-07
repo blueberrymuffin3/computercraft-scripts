@@ -42,6 +42,9 @@ eventHandler.schedule(function()
         string.lower(query)
       ) ~= nil
     end,
+    getItemKey=function(item)
+      return item.key
+    end,
     compare=function(a, b)
       return a.total > b.total
     end,
@@ -73,9 +76,6 @@ eventHandler.schedule(function()
         items[key] = item
       end
       updateListView()
-    end,
-    getItemKey=function(item)
-      return item.key
     end,
   }.handle)
   netMan.sendToType("server", "refresh")
