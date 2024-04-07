@@ -10,10 +10,12 @@ eventHandler.schedule(function()
 
   local function triggerDropAction(ammount)
     return function(item)
-      netMan.sendToType("server", "dropItems", {
-        key=item.key,
-        ammount=ammount,
-      })
+      if item then
+        netMan.sendToType("server", "dropItems", {
+          key=item.key,
+          ammount=ammount,
+        })
+      end
     end
   end
 
