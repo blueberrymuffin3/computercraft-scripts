@@ -247,9 +247,20 @@ eventHandler.schedule(function()
     updateListPeriodic.trigger()
   end
 
+  local function updateDisk(side)
+    if disk.hasData(side) then
+      target = disk.getMountPath(side) .. "/ea"
+      print("Copying update to drive " .. side .. "(" .. target .. ")")
+      fs.delete(target)
+      fs.copy("/ea", target)
+      disk.eject(side)
+    end
+  end
+
   eventHandler.addHandlerMap{
     peripheral=updateItemsPeriodic.trigger,
     peripheral_detach=updateItemsPeriodic.trigger,
+    disk=updateDisk,
   }
 
   netMan.openAll()
