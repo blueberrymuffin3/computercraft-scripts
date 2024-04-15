@@ -28,16 +28,18 @@ local function open(side)
   eventHandler.addHandlerMap(eventHandlerMap)
 end
 
-local function openFirstWired()
-  local side = peripheral.find("modem", function(side, modem) return not modem.isWireless() end)
-  open(peripheral.getName(side))
+local function openAll()
+  local sides = {peripheral.find("modem")}
+  for _, side in pairs(sides) do
+    open(peripheral.getName(side))
+  end
 end
 
 return {
   networkId=networkId,
   nodeType=nodeType,
   nodeName=nodeName,
-  openFirstWired=openFirstWired,
+  openAll=openAll,
   wakeupType=function(targetType)
     for _, pName in pairs(peripheral.getNames()) do
       if peripheral.hasType(pName, "computer") then

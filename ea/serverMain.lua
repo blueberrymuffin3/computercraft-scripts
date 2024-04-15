@@ -252,7 +252,7 @@ eventHandler.schedule(function()
     peripheral_detach=updateItemsPeriodic.trigger,
   }
 
-  netMan.openFirstWired()
+  netMan.openAll()
   netMan.addMessageHandler(delegator{
     refresh=updateItemsPeriodic.trigger,
     dropItems=function(message)

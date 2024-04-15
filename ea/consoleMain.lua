@@ -65,7 +65,7 @@ eventHandler.schedule(function()
   }
 
   netMan.wakeupType("server")
-  netMan.openFirstWired()
+  netMan.openAll()
   netMan.addMessageHandler(delegator{
     itemsClear=function(message)
       items = {}
