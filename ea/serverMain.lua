@@ -19,7 +19,6 @@ eventHandler.schedule(function()
     return textutils.serializeJSON{
       name=item.name,
       nbt=item.nbt,
-      damage=item.damage
     }
   end
 

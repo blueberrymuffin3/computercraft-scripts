@@ -35,8 +35,37 @@ eventHandler.schedule(function()
     homeListView.setList(itemsList)
   end
 
+  local function renderListItem(item)
+    local text = {item.total.." x "..item.details.displayName}
+    -- Whether to tell the user this item has NBT data
+    -- We don't do this when displaying damage or enchants
+    local addNbt = item.details.nbt ~= nil
+
+    if item.details.maxDamage ~= nil then
+      table.insert(text, " ("..(item.details.maxDamage-item.details.damage).."/"..(item.details.maxDamage)..")")
+      addNbt = false
+    end
+
+    if item.details.enchantments ~= nil then
+      table.insert(text, " [")
+      for _, enchantment in ipairs(item.details.enchantments) do
+        table.insert(text, enchantment.displayName.." "..enchantment.level)
+        table.insert(text, ", ")
+      end
+      table.remove(text) -- Remove final comma
+      table.insert(text, "]")
+      addNbt = false
+    end
+
+    if addNbt then
+      table.insert(text, " [+NBT]")
+    end
+
+    return table.concat(text)
+  end
+
   homeListView = listView{
-    renderListItem=function(item) return item.total.." x "..item.details.displayName end,
+    renderListItem=renderListItem,
     queryMatches=function(query, item)
       if string.sub(query, 1, 1) == "@" then
         return string.find(
