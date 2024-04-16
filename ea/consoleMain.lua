@@ -42,14 +42,16 @@ eventHandler.schedule(function()
     local addNbt = item.details.nbt ~= nil
 
     if item.details.maxDamage ~= nil then
-      table.insert(text, " ("..(item.details.maxDamage-item.details.damage).."/"..(item.details.maxDamage)..")")
+      if item.details.damage ~= 0 then
+        table.insert(text, " ("..(item.details.maxDamage-item.details.damage).."/"..(item.details.maxDamage)..")")
+      end
       addNbt = false
     end
 
     if item.details.enchantments ~= nil then
       table.insert(text, " [")
       for _, enchantment in ipairs(item.details.enchantments) do
-        table.insert(text, enchantment.displayName.." "..enchantment.level)
+        table.insert(text, enchantment.displayName)
         table.insert(text, ", ")
       end
       table.remove(text) -- Remove final comma
@@ -74,10 +76,21 @@ eventHandler.schedule(function()
         ) == 1
       end
     
-      return string.find(
+      local match = string.find(
         string.lower(item.details.displayName),
         string.lower(query)
       ) ~= nil
+
+      if item.details.enchantments ~= nil then
+        for _, enchantment in ipairs(item.details.enchantments) do
+          match = match or string.find(
+            string.lower(enchantment.displayName),
+            string.lower(query)
+          ) ~= nil
+        end
+      end
+
+      return match
     end,
     getItemKey=function(item)
       return item.key
