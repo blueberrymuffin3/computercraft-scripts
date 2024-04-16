@@ -1,10 +1,17 @@
 local eventHandler = require("eventHandler")
-local taskStatus = require("taskStatus")
 
 eventHandler.schedule(function()
   local netMan = require("netMan")
   local listView = require("listView")
   local delegator = require("delegator")
+  local taskStatus = require("taskStatus")
+  local settingsUtil = require("settingsUtil")
+
+  settings.define("ea.console.drop_target", {
+    description = "Peripheral name to send dropped items to. Must be an inventory.",
+    type = "string",
+  })
+  local dropTarget = settingsUtil.getRequired("ea.console.drop_target")
 
   local items = {}
 
@@ -14,6 +21,7 @@ eventHandler.schedule(function()
         netMan.sendToType("server", "dropItems", {
           key=item.key,
           ammount=ammount,
+          target=dropTarget
         })
       end
     end

@@ -10,7 +10,6 @@ eventHandler.schedule(function()
   local itemsDirtySet = {}
   local itemsDirtyAll = false
   local allStorages = {}
-  local dropoffPName = nil
 
   local updateItemsPeriodic
   local importItemsPeriodic
@@ -87,9 +86,7 @@ eventHandler.schedule(function()
 
       for _, pName in ipairs(peripheral.getNames()) do
         local pMode = getPMode(pName)
-        if pMode == "output" then
-          dropoffPName = pName
-        elseif pMode == "storage" then
+        if pMode == "storage" then
           local statusPrefix = "Scanning "..pName.." ("
 
           updateLine(statusPrefix)
@@ -267,7 +264,7 @@ eventHandler.schedule(function()
   netMan.addMessageHandler(delegator{
     refresh=updateItemsPeriodic.trigger,
     dropItems=function(message)
-      triggerDropItems(message.key, message.ammount, dropoffPName)
+      triggerDropItems(message.key, message.ammount, message.target)
     end,
   }.handle)
   netMan.sendToType("console", "itemsClear")
