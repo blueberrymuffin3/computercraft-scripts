@@ -27,6 +27,20 @@ eventHandler.schedule(function()
     end
   end
 
+  local function triggerImportAction()
+    return function(item)
+      local list = {}
+      for slot=1,16 do
+        list[slot] = turtle.getItemDetail(slot)
+      end
+
+      netMan.sendToType("server", "importFrom", {
+        target=dropTarget,
+        list=list
+      })
+    end
+  end
+
   local function updateListView()
     local itemsList = {}
     for _, item in pairs(items) do
@@ -110,6 +124,10 @@ eventHandler.schedule(function()
       [keys.e]={
         description="Drop 64",
         action=triggerDropAction(64),
+      },
+      [keys.i]=turtle and {
+        description="Import",
+        action=triggerImportAction(),
       },
     },
   }

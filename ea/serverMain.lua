@@ -10,6 +10,7 @@ eventHandler.schedule(function()
   local itemsDirtySet = {}
   local itemsDirtyAll = false
   local allStorages = {}
+  local requestedExtraImports = {}
 
   local updateItemsPeriodic
   local importItemsPeriodic
@@ -31,6 +32,8 @@ eventHandler.schedule(function()
       return "storage"
     elseif string.find(pName, "botania:open_crate_") == 1 then
       return "output"
+    elseif string.find(pName, "turtle_") == 1 then
+      return nil -- Require manual import
     elseif peripheral.hasType(pName, "inventory") then
       return "import"
     end
@@ -119,19 +122,30 @@ eventHandler.schedule(function()
 
       local imports = {}
 
+      local thisRequestedExtraImports = requestedExtraImports
+      requestedExtraImports = {}
+
+      local function scanPeripheral(pName, list)
+        for slot, stack in pairs(list) do
+          table.insert(imports, {
+            pName=pName,
+            slot=slot,
+            stack=stack,
+          })
+        end
+      end
+
+      for pName, list in pairs(thisRequestedExtraImports) do
+        scanPeripheral(pName, list)
+      end
+
       for _, pName in ipairs(peripheral.getNames()) do
         local pMode = getPMode(pName)
 
         if pMode == "import" then
-          local pWrap = peripheral.wrap(pName)
+          local list = peripheral.call(pName, "list")
 
-          for slot, stack in pairs(pWrap.list()) do
-            table.insert(imports, {
-              pName=pName,
-              slot=slot,
-              stack=stack,
-            })
-          end
+          scanPeripheral(pName, list)
         end
       end
 
@@ -150,7 +164,7 @@ eventHandler.schedule(function()
               break
             end
 
-            local transfered = peripheral.call(pName, "pushItems", location.pName, slot, remaining, location.slot)
+            local transfered = peripheral.call(location.pName, "pullItems", pName, slot, remaining, location.slot) or 0
             remaining = remaining - transfered
             location.count = location.count + transfered
             items[key].total = items[key].total + transfered
@@ -160,7 +174,7 @@ eventHandler.schedule(function()
 
         if remaining > 0 then
           for _, storagePName in pairs(allStorages) do
-            local transfered = peripheral.call(pName, "pushItems", storagePName, slot)
+            local transfered = peripheral.call(storagePName, "pullItems", pName, slot) or 0
             remaining = remaining - transfered
             rescanRequired = true
           end
@@ -229,7 +243,8 @@ eventHandler.schedule(function()
 
     while ammountLeft > 0 and data.total > 0 do
       local location = data.locations[1]
-      local ammountMoved = peripheral.call(target, "pullItems", location.pName, location.slot, ammountLeft)
+      -- local ammountMoved = peripheral.call(target, "pullItems", location.pName, location.slot, ammountLeft)
+      local ammountMoved = peripheral.call(location.pName, "pushItems", target, location.slot, ammountLeft)
       ammountLeft = ammountLeft - ammountMoved
       data.total = data.total - ammountMoved
       location.count = location.count - ammountMoved
@@ -241,6 +256,11 @@ eventHandler.schedule(function()
     end
 
     updateListPeriodic.trigger()
+  end
+
+  local function triggerTurtleImport(target, list)
+    requestedExtraImports[target] = list
+    importItemsPeriodic.trigger()
   end
 
   local function updateDisk(side)
@@ -264,6 +284,9 @@ eventHandler.schedule(function()
     refresh=updateItemsPeriodic.trigger,
     dropItems=function(message)
       triggerDropItems(message.key, message.ammount, message.target)
+    end,
+    importFrom=function(message)
+      triggerTurtleImport(message.target, message.list)
     end,
   }.handle)
   netMan.sendToType("console", "itemsClear")
