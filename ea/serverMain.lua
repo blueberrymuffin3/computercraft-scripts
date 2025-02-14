@@ -243,8 +243,11 @@ eventHandler.schedule(function()
 
     while ammountLeft > 0 and data.total > 0 do
       local location = data.locations[1]
-      -- local ammountMoved = peripheral.call(target, "pullItems", location.pName, location.slot, ammountLeft)
       local ammountMoved = peripheral.call(location.pName, "pushItems", target, location.slot, ammountLeft)
+      if ammountMoved or 0 == 0 then
+        print("Error dropping items, ignoring")
+        break
+      end
       ammountLeft = ammountLeft - ammountMoved
       data.total = data.total - ammountMoved
       location.count = location.count - ammountMoved
