@@ -12,6 +12,9 @@ else
     local secrets = require("secrets")
     local body = {
         content="`"..os.getComputerLabel().."` has crashed <@"..secrets.pingUserId..">\n```\n"..err.."\n```",
+        allowed_mentions={
+            users={secrets.pingUserId}
+        }
     }
     local headers = {
         ["Content-Type"]="application/json"
