@@ -267,7 +267,7 @@ eventHandler.schedule(function()
   end
 
   local function updateDisk(side)
-    if disk.hasData(side) then
+    if side == "bottom" and disk.hasData(side) then
       target = disk.getMountPath(side) .. "/ea"
       print("Copying update to drive " .. side .. "(" .. target .. ")")
       fs.delete(target)
