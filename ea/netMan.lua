@@ -1,8 +1,9 @@
 local eventHandler = require("eventHandler")
 
-local networkId, nodeType, nodeName = string.match(os.getComputerLabel(), "^(ea_%w+)_(%w+)_(.+)$")
+local label = os.getComputerLabel()
+local networkId, nodeType, nodeName = string.match(label, "^(ea_%w+)_(%w+)_(.+)$")
 if networkId == nil then
-  error("Improper label " .. os.getComputerLabel())
+  error("Improper label " .. label)
 end
 
 print("netMan init:", "nid="..networkId, "type="..nodeType, "name="..nodeName)
@@ -11,7 +12,7 @@ local messageHandlers = {}
 
 local eventHandlerMap = {
   rednet_message=function(senderId, message, protocol)
-    if string.find(protocol, "ea_"..nodeType) == 1 then
+    if string.find(protocol, networkId.."_"..nodeType) == 1 then
       if type(message) ~= "table" then return end
       if type(message.kind) ~= "string" then return end
 
@@ -24,7 +25,7 @@ local eventHandlerMap = {
 
 local function open(side)
   rednet.open(side)
-  rednet.host("ea_"..nodeType, nodeName)
+  rednet.host(networkId.."_"..nodeType, label)
   eventHandler.addHandlerMap(eventHandlerMap)
 end
 
@@ -45,7 +46,7 @@ return {
       if peripheral.hasType(pName, "computer") then
         local targetLabel = peripheral.call(pName, "getLabel")
 
-        if string.find(targetLabel, networkId.."_"..targetType) == 1 then
+        if targetLabel and string.find(targetLabel, networkId.."_"..targetType) == 1 then
           -- print("Waking up " .. targetLabel)
           peripheral.call(pName, "turnOn")
         end
@@ -56,7 +57,7 @@ return {
     rednet.broadcast({
       kind=kind,
       message=message,
-    }, "ea_"..targetType)
+    }, networkId.."_"..targetType)
   end,
   addMessageHandler=function(handler)
     messageHandlers[handler] = true
