@@ -125,7 +125,7 @@ eventHandler.schedule(function()
         description="Drop 64",
         action=triggerDropAction(64),
       },
-      [keys.i]=turtle and {
+      [keys.d]=turtle and {
         description="Import",
         action=triggerImportAction(),
       },
