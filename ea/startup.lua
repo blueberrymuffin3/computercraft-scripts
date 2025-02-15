@@ -21,6 +21,7 @@ for _, name in ipairs(peripheral.getNames()) do
 
     if readFile("/startup") ~= readFile(fs.combine(mountPath, "ea/startup.lua")) then
       print("Updating startup file...")
+      fs.delete("/startup")
       fs.copy(fs.combine(mountPath, "ea/startup.lua"), "/startup")
       print("Rebooting...")
       sleep(2)
