@@ -79,4 +79,4 @@ function doUpdate()
   os.reboot()
 end
 
-return doUpdate()
+return doUpdate

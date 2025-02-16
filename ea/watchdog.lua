@@ -9,7 +9,7 @@ else
     print("Sending error report to admin")
     sleep(1) -- Allow quick user to cancel message
     
-    local secrets = require("secrets")
+    local secrets = require("/secrets")
     local body = {
         content="`"..os.getComputerLabel().."` has crashed <@"..secrets.pingUserId..">\n```\n"..err.."\n```",
         allowed_mentions={
