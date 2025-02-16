@@ -66,6 +66,7 @@ function doUpdate()
   fs.move(eaPath, eaOldPath)
   fs.move(ea2Path, eaPath)
   fs.delete(eaOldPath)
+  fs.delete("/startup.lua")
   fs.copy(fs.combine(eaPath, "startup.lua"), "/startup.lua")
 
   if netMan.nodeType == "server" then
