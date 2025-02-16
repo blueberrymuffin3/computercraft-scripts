@@ -6,6 +6,7 @@ eventHandler.schedule(function()
   local delegator = require("delegator")
   local taskStatus = require("taskStatus")
   local settingsUtil = require("settingsUtil")
+  local checkForUpdate = require("update")
 
   settings.define("ea.console.drop_target", {
     description = "Peripheral name to send dropped items to. Must be an inventory.",
