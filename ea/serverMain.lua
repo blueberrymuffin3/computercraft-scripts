@@ -5,6 +5,7 @@ eventHandler.schedule(function()
   local delegator = require("delegator")
   local periodic = require("periodic")
   local taskStatus = require("taskStatus")
+  local checkForUpdate = require("update")
 
   local items = {}
   local itemsDirtySet = {}
@@ -278,6 +279,8 @@ eventHandler.schedule(function()
     end,
   }.handle)
   netMan.sendToType("console", "itemsClear")
+
+  checkForUpdate()
 end)
 
 eventHandler.run()

@@ -134,6 +134,7 @@ eventHandler.schedule(function()
 
   netMan.wakeupType("server")
   netMan.openAll()
+  checkForUpdate()
   netMan.addMessageHandler(delegator{
     itemsClear=function(message)
       items = {}
@@ -144,6 +145,13 @@ eventHandler.schedule(function()
         items[key] = item
       end
       updateListView()
+    end,
+    reboot=function()
+      term.clear()
+      term.setCursorPos(1, 1)
+      print("Reboot requested, rebooting in 2 seconds...")
+      sleep(2)
+      os.reboot()
     end,
   }.handle)
   netMan.sendToType("server", "refresh")
