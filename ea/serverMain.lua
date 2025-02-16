@@ -30,8 +30,8 @@ eventHandler.schedule(function()
       return "storage"
     elseif string.find(pName, "charm:.+_chest") == 1 then
       return "storage"
-    elseif string.find(pName, "botania:open_crate_") == 1 then
-      return "output"
+    elseif string.find(pName, "sophisticatedstorage:chest") == 1 then
+      return "storage"
     elseif string.find(pName, "turtle_") == 1 then
       return nil -- Require manual import
     elseif peripheral.hasType(pName, "inventory") then
