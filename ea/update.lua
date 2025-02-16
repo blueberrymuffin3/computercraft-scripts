@@ -24,12 +24,12 @@ function doUpdate()
   local json = response.readAll()
   json = textutils.unserializeJSON(json)
 
-  myVersion = pcall(function() return require "version" end)
+  versionOk, myVersion = pcall(function() return require "version" end)
   commit = json.sha
   print("Current Version:", myVersion)
   print("Latest Version:", commit)
 
-  if commit == myVersion then
+  if versionOk and commit == myVersion then
     print("EA is up to date "..commit)
     return
   end
@@ -59,8 +59,8 @@ function doUpdate()
   fs.delete(ea2Path)
   tar.extract(archive, ea2Path)
   local versionFile = fs.open(fs.combine(ea2Path, "version.lua"), "w")
-  versionFile:write("return "..textutils.serialise(commit))
-  versionFile:close()
+  versionFile.write("return "..textutils.serialise(commit))
+  versionFile.close()
 
   fs.delete(eaOldPath)
   fs.move(eaPath, eaOldPath)
