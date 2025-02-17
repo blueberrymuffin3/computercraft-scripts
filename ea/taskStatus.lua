@@ -6,6 +6,7 @@ local myTasks = {}
 
 local function sendTasks()
   netMan.sendToType("console", "tasks", {
+    type=netMan.nodeType,
     host=netMan.nodeType.." "..netMan.nodeName,
     tasks=myTasks
   })
