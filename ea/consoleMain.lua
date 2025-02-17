@@ -8,11 +8,7 @@ eventHandler.schedule(function()
   local settingsUtil = require("settingsUtil")
   local checkForUpdate = require("update")
 
-  settings.define("ea.console.drop_target", {
-    description = "Peripheral name to send dropped items to. Must be an inventory.",
-    type = "string",
-  })
-  local dropTarget = settingsUtil.getRequired("ea.console.drop_target")
+  local dropTarget = peripheral.find("modem").getNameLocal() or error("Could not determine console's peripheral name")
 
   local items = {}
 
