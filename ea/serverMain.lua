@@ -75,7 +75,7 @@ eventHandler.schedule(function()
     maxDelay=35,
     minDelay=2,
     initialDelay=1,
-    action=function()
+    action=taskStatus.wrap("Scanning storage", function(progress)
       print("Scanning all storage")
 
       itemsDirtyAll = true
@@ -87,9 +87,11 @@ eventHandler.schedule(function()
 
       allStorages = {}
 
-      for _, pName in ipairs(peripheral.getNames()) do
+      local peripheralNames = peripheral.getNames()
+      for i, pName in ipairs(peripheralNames) do
         local pMode = getPMode(pName)
         if pMode == "storage" then
+          progress(i, #peripheralNames)
           local statusPrefix = "Scanning "..pName.." ("
 
           updateLine(statusPrefix)
@@ -110,7 +112,7 @@ eventHandler.schedule(function()
       end
 
       updateListPeriodic.trigger()
-    end,
+    end),
   }
 
   importItemsPeriodic = periodic{
@@ -192,7 +194,7 @@ eventHandler.schedule(function()
 
   updateListPeriodic = periodic{
     minDelay=0.1,
-    action=function()
+    action=taskStatus.wrap("Loading", function(progress)
       local packet = {}
       local itemsN = 0
       local packetN = 0
@@ -235,7 +237,7 @@ eventHandler.schedule(function()
 
       itemsDirtyAll = false
       itemsDirtySet = {}
-    end,
+    end),
   }
 
   local function triggerDropItems(key, ammount, target)
@@ -250,6 +252,10 @@ eventHandler.schedule(function()
       location.count = location.count - ammountMoved
       if location.count == 0 then
         table.remove(data.locations, 1)
+      end
+
+      if ammountMoved == 0 then
+        break
       end
 
       itemsDirtySet[key] = true

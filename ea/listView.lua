@@ -11,7 +11,7 @@
 local eventHandler = require("eventHandler")
 local delegator = require("delegator")
 local typeCheck = require("typeCheck")
-local taskStatusDisplay = require("taskStatusDisplay")
+require("taskStatusDisplay")
 
 local controlHeld = false
 
@@ -38,9 +38,7 @@ function ListView(config)
   local query = ""
 
   local function writeLine(text, width, align)
-    if align == nil then
-      align = 0
-    end
+    align = align or 0
 
     local textLen = string.len(text)
 
@@ -91,10 +89,11 @@ function ListView(config)
     local width, height = term.getSize()
 
     -- Render header lines
-    local headerLinesN = 1
+    -- (reserve one line for taskStatusDisplay)
+    local headerLinesN = 2
     term.setBackgroundColor(colors.white)
     term.setTextColor(colors.black)
-    term.setCursorPos(1, 1)
+    term.setCursorPos(1, 2)
     writeLine("Search: "..query.."_", width, 0.5)
     
     -- Render footer lines
@@ -132,8 +131,6 @@ function ListView(config)
         writeLine("~", width)
       end
     end
-
-    taskStatusDisplay.render()
 
     -- Reset colors
     term.setBackgroundColor(colors.black)
