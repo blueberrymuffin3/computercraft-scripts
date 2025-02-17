@@ -153,7 +153,7 @@ eventHandler.schedule(function()
       end
 
       for i, import in pairs(imports) do
-        progress(i, #import)
+        progress(i, #imports)
 
         local pName = import.pName
         local slot = import.slot

@@ -4,15 +4,19 @@ local netMan = require("netMan")
 
 local allTasks = {}
 
-local function writeLine(text, width)
+local function writeLine(text, width, fg, bg1, bg2, percent)
   align = align or 0
+  bg2 = bg2 or bg1
+  percent = percent or 0
 
   local suffix = width - string.len(text)
-  for i=1,suffix do
-    text = text.." "
-  end
-  
-  term.write(text)
+  text = text..string.rep(" ", suffix)
+
+  local fg = string.rep(colors.toBlit(fg), width)
+  local bg = string.rep(colors.toBlit(bg1), width * percent)
+  bg = bg..string.rep(colors.toBlit(bg2), width - string.len(bg))
+
+  term.blit(text, fg, bg)
 end
 
 local function render()
@@ -31,20 +35,22 @@ local function render()
 
   term.setCursorPos(1, 1)
   if taskCount > 0 then
-    term.setBackgroundColor(colors.orange)
-    term.setTextColor(colors.black)
     local text = chosenHost..": "..chosenTask.name
-    if chosenTask.total ~= nil and chosenTask.done ~= nil then
-      text = text.." ("..chosenTask.done.."/"..chosenTask.total..")"
+    local progress = 0
+    if chosenTask.done ~= nil then
+      if chosenTask.total ~= nil and chosenTask.total > 0 then
+        text = text.." ("..chosenTask.done.."/"..chosenTask.total..")"
+        progress = chosenTask.done / chosenTask.total
+      else
+        text = text.." ("..chosenTask.done.."/?)"
+      end
     end
     if taskCount > 1 then
       text = text.." [+"..(taskCount-1).."]"
     end
-    writeLine(text, width)
+    writeLine(text, width, colors.black, colors.orange, colors.yellow, progress)
   else
-    term.setBackgroundColor(colors.green)
-    term.setTextColor(colors.black)
-    writeLine("Ready", width)
+    writeLine("Ready", width, colors.black, colors.green)
   end
 
   term.setBackgroundColor(colors.black)
