@@ -35,7 +35,7 @@ local function render()
     term.setTextColor(colors.black)
     local text = chosenHost..": "..chosenTask.name
     if chosenTask.total ~= nil and chosenTask.done ~= nil then
-      text = text.." ("..chosenTask.total.."/"..chosenTask.done..")"
+      text = text.." ("..chosenTask.done.."/"..chosenTask.total..")"
     end
     if taskCount > 1 then
       text = text.." [+"..(taskCount-1).."]"

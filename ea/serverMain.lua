@@ -75,7 +75,7 @@ eventHandler.schedule(function()
     maxDelay=35,
     minDelay=2,
     initialDelay=1,
-    action=taskStatus.wrap("Scanning storage", function(progress)
+    action=taskStatus.wrap("Scanning", function(progress)
       print("Scanning all storage")
 
       itemsDirtyAll = true
