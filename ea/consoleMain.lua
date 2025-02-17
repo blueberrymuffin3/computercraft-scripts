@@ -7,6 +7,7 @@ eventHandler.schedule(function()
   local taskStatus = require("taskStatus")
   local settingsUtil = require("settingsUtil")
   local checkForUpdate = require("update")
+  checkForUpdate()
 
   local dropTarget = peripheral.find("modem").getNameLocal() or error("Could not determine console's peripheral name")
 
@@ -131,7 +132,6 @@ eventHandler.schedule(function()
 
   netMan.wakeupType("server")
   netMan.openAll()
-  checkForUpdate()
   netMan.addMessageHandler(delegator{
     itemsClear=function(message)
       items = {}
