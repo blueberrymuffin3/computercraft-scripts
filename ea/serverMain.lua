@@ -27,7 +27,7 @@ eventHandler.schedule(function()
 
   local function getPMode(pName)
     if string.find(pName, "minecraft:barrel_") == 1 then
-      return "storage"
+      return "import"
     elseif string.find(pName, "turtle_") == 1 then
       return nil -- Require manual import
     elseif peripheral.hasType(pName, "inventory") then
