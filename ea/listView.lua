@@ -59,14 +59,14 @@ function ListView(config)
     local width, height = term.getSize()
   
     local lines = {}
-    local seperator = "  "
+    local separator = "  "
     local line = nil
 
     for key, data in pairs(config.hotkeys) do
       local keyName = keys.getName(key)
       local entry = "ctrl-"..keyName..":"..data.description
       if line ~= nil then
-        local newLine = line..seperator..entry
+        local newLine = line..separator..entry
         if string.len(newLine) > width then
           table.insert(lines, line)
           line = entry

@@ -167,18 +167,18 @@ eventHandler.schedule(function()
               break
             end
 
-            local transfered = peripheral.call(location.pName, "pullItems", pName, slot, remaining, location.slot) or 0
-            remaining = remaining - transfered
-            location.count = location.count + transfered
-            items[key].total = items[key].total + transfered
+            local transferred = peripheral.call(location.pName, "pullItems", pName, slot, remaining, location.slot) or 0
+            remaining = remaining - transferred
+            location.count = location.count + transferred
+            items[key].total = items[key].total + transferred
             itemsDirtySet[key] = true
           end
         end
 
         if remaining > 0 then
           for _, storagePName in pairs(allStorages) do
-            local transfered = peripheral.call(storagePName, "pullItems", pName, slot) or 0
-            remaining = remaining - transfered
+            local transferred = peripheral.call(storagePName, "pullItems", pName, slot) or 0
+            remaining = remaining - transferred
             rescanRequired = true
           end
         end
@@ -240,21 +240,21 @@ eventHandler.schedule(function()
     end),
   }
 
-  local function triggerDropItems(key, ammount, target)
+  local function triggerDropItems(key, amount, target)
     local data = items[key]
-    local ammountLeft = ammount
+    local amountLeft = amount
 
-    while ammountLeft > 0 and data.total > 0 do
+    while amountLeft > 0 and data.total > 0 do
       local location = data.locations[1]
-      local ammountMoved = peripheral.call(location.pName, "pushItems", target, location.slot, ammountLeft) or 0
-      ammountLeft = ammountLeft - ammountMoved
-      data.total = data.total - ammountMoved
-      location.count = location.count - ammountMoved
+      local amountMoved = peripheral.call(location.pName, "pushItems", target, location.slot, amountLeft) or 0
+      amountLeft = amountLeft - amountMoved
+      data.total = data.total - amountMoved
+      location.count = location.count - amountMoved
       if location.count == 0 then
         table.remove(data.locations, 1)
       end
 
-      if ammountMoved == 0 then
+      if amountMoved == 0 then
         break
       end
 
@@ -278,7 +278,7 @@ eventHandler.schedule(function()
   netMan.addMessageHandler(delegator{
     refresh=updateItemsPeriodic.trigger,
     dropItems=function(message)
-      triggerDropItems(message.key, message.ammount, message.target)
+      triggerDropItems(message.key, message.amount, message.target)
     end,
     importFrom=function(message)
       triggerTurtleImport(message.target, message.list)
