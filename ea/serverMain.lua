@@ -10,7 +10,8 @@ eventHandler.schedule(function()
   local items = {}
   local itemsDirtySet = {}
   local itemsDirtyAll = false
-  local allStorages = {}
+  local allStoragesLowPrio = {}
+  local allStoragesHighPrio = {}
   local requestedExtraImports = {}
 
   local updateItemsPeriodic
@@ -25,20 +26,22 @@ eventHandler.schedule(function()
   end
 
   local function getPMode(pName)
-    if string.find(pName, "create:item_vault_") == 1 then
-      return "storage"
-    elseif string.find(pName, "minecraft:chest_") == 1 then
-      return "storage"
-    elseif string.find(pName, "charm:.+_chest") == 1 then
-      return "storage"
-    elseif string.find(pName, "sophisticatedstorage:chest") == 1 then
+    if string.find(pName, "minecraft:barrel_") == 1 then
       return "storage"
     elseif string.find(pName, "turtle_") == 1 then
       return nil -- Require manual import
     elseif peripheral.hasType(pName, "inventory") then
-      return "import"
+      return "storage"
     end
     return nil
+  end
+
+  local function isHighPrioStorage(pName)
+    if string.find(pName, "storagedrawers") == 1 then
+      return true
+    else
+      return false
+    end
   end
 
   local function insertLocation(pName, slot, key, count)
@@ -85,7 +88,8 @@ eventHandler.schedule(function()
         data.total = 0
       end
 
-      allStorages = {}
+      allStoragesLowPrio = {}
+      allStoragesHighPrio = {}
 
       local peripheralNames = peripheral.getNames()
       for i, pName in ipairs(peripheralNames) do
@@ -95,7 +99,11 @@ eventHandler.schedule(function()
           local statusPrefix = "Scanning "..pName.." ("
 
           updateLine(statusPrefix)
-          table.insert(allStorages, pName)
+          if isHighPrioStorage(pName) then
+            table.insert(allStoragesHighPrio, pName)
+          else
+            table.insert(allStoragesLowPrio, pName)
+          end
           local pWrap = peripheral.wrap(pName)
           local pList = pWrap.list()
           
@@ -176,10 +184,13 @@ eventHandler.schedule(function()
         end
 
         if remaining > 0 then
-          for _, storagePName in pairs(allStorages) do
-            local transferred = peripheral.call(storagePName, "pullItems", pName, slot) or 0
-            remaining = remaining - transferred
-            rescanRequired = true
+          for _, allStorages in ipairs({allStoragesHighPrio, allStoragesLowPrio}) do
+            for _, storagePName in pairs(allStorages) do
+              local transferred = peripheral.call(storagePName, "pullItems", pName, slot) or 0
+              remaining = remaining - transferred
+              rescanRequired = true
+              if remaining == 0 then break end
+            end
           end
         end
       end
