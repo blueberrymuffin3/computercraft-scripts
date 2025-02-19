@@ -30,6 +30,8 @@ eventHandler.schedule(function()
       return "import"
     elseif string.find(pName, "turtle_") == 1 then
       return nil -- Require manual import
+    elseif string.find(pName, "enderstorage:ender_chest_") == 1 then
+      return nil -- Require manual import
     elseif peripheral.hasType(pName, "inventory") then
       return "storage"
     end
