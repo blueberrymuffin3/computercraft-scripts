@@ -1,4 +1,3 @@
-print("Starting EA in 2 seconds...")
-sleep(2)
+print("Starting EA...")
 
 shell.run("ea/watchdog.lua")

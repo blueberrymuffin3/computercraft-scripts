@@ -159,4 +159,5 @@ while true do
 
   print("Sleeping")
   sleep(4 * 60)
+  assert(goTo(farmX1, homeY, homeZ))
 end

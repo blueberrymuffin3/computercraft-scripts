@@ -82,8 +82,7 @@ function doUpdate()
     end
 
     progress(5, 6)
-    print("Rebooting in 2 seconds...")
-    sleep(2)
+    print("Rebooting...")
     os.reboot()
     -- never return, task cleared on reboot
   end)

@@ -31,6 +31,6 @@ else
     end
 end
 
-print("Restarting in 2 seconds")
-sleep(2)
+print("Restarting in 6 seconds")
+sleep(6)
 os.reboot()
