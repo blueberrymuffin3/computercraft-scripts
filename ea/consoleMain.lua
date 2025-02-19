@@ -9,7 +9,16 @@ eventHandler.schedule(function()
   local checkForUpdate = require("update")
   checkForUpdate()
 
-  local dropTarget = peripheral.find("modem").getNameLocal() or error("Could not determine console's peripheral name")
+  local dropTarget
+  if turtle then
+    dropTarget = peripheral.find("modem").getNameLocal() or error("Could not determine console's peripheral name")
+  else
+    settings.define("ea.console.drop_target", {
+      description = "Peripheral name to send dropped items to. Must be an inventory.",
+      type = "string",
+    })
+    dropTarget = settingsUtil.getRequired("ea.console.drop_target")
+  end
 
   local items = {}
 
@@ -27,15 +36,21 @@ eventHandler.schedule(function()
 
   local function triggerImportAction()
     return function(item)
-      local list = {}
-      for slot=1,16 do
-        list[slot] = turtle.getItemDetail(slot)
-      end
+      if turtle then
+        local list = {}
+        for slot=1,16 do
+          list[slot] = turtle.getItemDetail(slot)
+        end
 
-      netMan.sendToType("server", "importFrom", {
-        target=dropTarget,
-        list=list
-      })
+        netMan.sendToType("server", "importFrom", {
+          target=dropTarget,
+          list=list
+        })
+      else
+        netMan.sendToType("server", "importFrom", {
+          target=dropTarget,
+        })
+      end
     end
   end
 
@@ -123,7 +138,7 @@ eventHandler.schedule(function()
         description="Drop 64",
         action=triggerDropAction(64),
       },
-      [keys.d]=turtle and {
+      [keys.d]={
         description="Import",
         action=triggerImportAction(),
       },

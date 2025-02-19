@@ -12,7 +12,8 @@ eventHandler.schedule(function()
   local itemsDirtyAll = false
   local allStoragesLowPrio = {}
   local allStoragesHighPrio = {}
-  local requestedExtraImports = {}
+  local requestedExtraTurtleImports = {}
+  local requestedExtraPersonalImports = {}
 
   local updateItemsPeriodic
   local importItemsPeriodic
@@ -134,10 +135,6 @@ eventHandler.schedule(function()
       local rescanRequired = false
 
       local imports = {}
-
-      local thisRequestedExtraImports = requestedExtraImports
-      requestedExtraImports = {}
-
       local function scanPeripheral(pName, list)
         for slot, stack in pairs(list) do
           table.insert(imports, {
@@ -148,7 +145,16 @@ eventHandler.schedule(function()
         end
       end
 
-      for pName, list in pairs(thisRequestedExtraImports) do
+      local thisRequestedExtraTurtleImports = requestedExtraTurtleImports
+      requestedExtraTurtleImports = {}
+      for pName, list in pairs(thisRequestedExtraTurtleImports) do
+        scanPeripheral(pName, list)
+      end
+
+      local thisRequestedExtraPersonalImports = requestedExtraPersonalImports
+      requestedExtraPersonalImports = {}
+      for pName, _ in pairs(thisRequestedExtraPersonalImports) do
+        local list = peripheral.call(pName, "list")
         scanPeripheral(pName, list)
       end
 
@@ -278,7 +284,12 @@ eventHandler.schedule(function()
   end
 
   local function triggerTurtleImport(target, list)
-    requestedExtraImports[target] = list
+    requestedExtraTurtleImports[target] = list
+    importItemsPeriodic.trigger()
+  end
+
+  local function triggerPersonalImport(target)
+    requestedExtraPersonalImports[target] = true
     importItemsPeriodic.trigger()
   end
 
@@ -294,7 +305,11 @@ eventHandler.schedule(function()
       triggerDropItems(message.key, message.amount, message.target)
     end,
     importFrom=function(message)
-      triggerTurtleImport(message.target, message.list)
+      if message.list then
+        triggerTurtleImport(message.target, message.list)
+      else
+        triggerPersonalImport(message.target)
+      end
     end,
   }.handle)
   netMan.sendToType("console", "itemsClear")

@@ -23,17 +23,14 @@ local eventHandlerMap = {
   end
 }
 
-local function open(side)
-  rednet.open(side)
+local function openAll()
+  for _, pName in ipairs(peripheral.getNames()) do
+    if peripheral.hasType(pName, "modem") then
+      rednet.open(pName)
+    end
+  end
   rednet.host(networkId.."_"..nodeType, label)
   eventHandler.addHandlerMap(eventHandlerMap)
-end
-
-local function openAll()
-  local sides = {peripheral.find("modem")}
-  for _, side in pairs(sides) do
-    open(peripheral.getName(side))
-  end
 end
 
 return {
