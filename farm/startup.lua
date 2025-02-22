@@ -145,7 +145,7 @@ while true do
   print("Dumping items")
   for i=2,15 do
     turtle.select(i)
-    turtle.drop(i)
+    turtle.drop()
   end
   
   while turtle.getFuelLevel() < 1000 do
