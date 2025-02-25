@@ -300,7 +300,7 @@ eventHandler.schedule(function()
 
   netMan.openAll()
   netMan.addMessageHandler(delegator{
-    refresh=updateItemsPeriodic.trigger,
+    refresh=updateListPeriodic.trigger,
     dropItems=function(message)
       triggerDropItems(message.key, message.amount, message.target)
     end,
