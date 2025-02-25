@@ -8,7 +8,7 @@ local function run()
   local c = coroutine.create(function()
     while true do
       while #eventQueue > 0 do
-        local eventData = table.remove(eventQueue)
+        local eventData = table.remove(eventQueue, 1)
         eventDelegator.handle(unpack(eventData))
       end
       coroutine.yield()
