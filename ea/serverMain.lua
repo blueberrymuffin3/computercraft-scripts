@@ -304,7 +304,10 @@ eventHandler.schedule(function()
 
   netMan.openAll()
   netMan.addMessageHandler(delegator{
-    refresh=updateListPeriodic.trigger,
+    refresh=function()
+      itemsDirtyAll = true
+      updateListPeriodic.trigger()
+    end,
     dropItems=function(message)
       triggerDropItems(message.key, message.amount, message.target)
     end,
