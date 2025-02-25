@@ -95,31 +95,35 @@ eventHandler.schedule(function()
       allStoragesHighPrio = {}
 
       local peripheralNames = peripheral.getNames()
-      for i, pName in ipairs(peripheralNames) do
-        local pMode = getPMode(pName)
-        if pMode == "storage" then
-          progress(i, #peripheralNames)
-          local statusPrefix = "Scanning "..pName.." ("
-
-          updateLine(statusPrefix)
-          if isHighPrioStorage(pName) then
-            table.insert(allStoragesHighPrio, pName)
-          else
-            table.insert(allStoragesLowPrio, pName)
-          end
-          local pWrap = peripheral.wrap(pName)
-          local pList = pWrap.list()
-          
-          local statusSuffix = "/"..table.getn(pList)..")"
-
-          for slot, stack in pairs(pList) do
-            if stack then
-              updateLine(statusPrefix..slot..statusSuffix)
-              insertLocation(pName, slot, getItemKey(stack), stack.count)
-            end
-          end
-          print()
+      local storagePeripheralNames = {}
+      for _, pName in ipairs(peripheralNames) do
+        if getPMode(pName) == "storage" then
+          table.insert(storagePeripheralNames, pName)
         end
+      end
+
+      for i, pName in ipairs(storagePeripheralNames) do
+        progress(i, #storagePeripheralNames)
+        local statusPrefix = "Scanning "..pName.." ("
+
+        updateLine(statusPrefix)
+        if isHighPrioStorage(pName) then
+          table.insert(allStoragesHighPrio, pName)
+        else
+          table.insert(allStoragesLowPrio, pName)
+        end
+        local pWrap = peripheral.wrap(pName)
+        local pList = pWrap.list()
+        
+        local statusSuffix = "/"..table.getn(pList)..")"
+
+        for slot, stack in pairs(pList) do
+          if stack then
+            updateLine(statusPrefix..slot..statusSuffix)
+            insertLocation(pName, slot, getItemKey(stack), stack.count)
+          end
+        end
+        print()
       end
 
       updateListPeriodic.trigger()
