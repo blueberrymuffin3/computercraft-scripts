@@ -53,6 +53,12 @@ eventHandler.schedule(function()
     end
   end
 
+  local function triggerCraft()
+    return function(item)
+      netMan.sendToType("crafter", "do_craft", {name=item.details.name, nbt=item.details.nbt})
+    end
+  end
+
   eventHandler.addHandlerMap{
     items_changed=function()
       local itemsList = {}
@@ -143,6 +149,10 @@ eventHandler.schedule(function()
         description="Import",
         action=triggerImportAction(),
       },
+      [keys.r]={
+        description="craft",
+        action=triggerCraft(),
+      }
     },
   }
 

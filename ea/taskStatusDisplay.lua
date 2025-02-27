@@ -90,12 +90,12 @@ local lines = {
     bg1=colors.orange,
     bg2=colors.yellow,
   },
-  -- {
-  --   y=2,
-  --   type="crafter",
-  --   bg1=colors.blue,
-  --   bg2=colors.lightBlue,
-  -- },
+  {
+    y=2,
+    type="crafter",
+    bg1=colors.blue,
+    bg2=colors.lightBlue,
+  },
 }
 
 local function render()

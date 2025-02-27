@@ -64,9 +64,10 @@ eventHandler.schedule(sendTasks)
 return {
   runAsTask=runAsTask,
   wrap=function(name, action)
-    return function()
+    return function(...)
+      local vargs = { ... }
       runAsTask(name, function(progress)
-        action(progress)
+        action(progress, table.unpack(vargs))
       end)
     end
   end

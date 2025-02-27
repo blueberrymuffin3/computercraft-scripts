@@ -7,6 +7,7 @@ eventHandler.schedule(function()
   local taskStatus = require("taskStatus")
   local checkForUpdate = require("update")
   local falliblePeripheral = require("falliblePeripheral")
+  local itemUtils = require("itemUtils")
 
   local items = {}
   local itemsDirtySet = {}
@@ -20,24 +21,16 @@ eventHandler.schedule(function()
   local importItemsPeriodic
   local updateListPeriodic
 
-  local function getItemKey(item)
-    return textutils.serializeJSON{
-      name=item.name,
-      nbt=item.nbt,
-    }
-  end
-
   local function getPMode(pName)
     if string.find(pName, "minecraft:barrel_") == 1 then
       return "import"
-    elseif string.find(pName, "turtle_") == 1 then
-      return nil -- Require manual import
-    elseif string.find(pName, "enderstorage:ender_chest_") == 1 then
-      return nil -- Require manual import
-    elseif peripheral.hasType(pName, "inventory") then
+    elseif string.find(pName, "minecraft:chest_") == 1 then
+      return nil -- used for crafter storage
+    elseif string.find(pName, "sophisticatedstorage:chest") == 1 then
       return "storage"
+    else
+      return nil
     end
-    return nil
   end
 
   local function isHighPrioStorage(pName)
@@ -120,7 +113,7 @@ eventHandler.schedule(function()
         for slot, stack in pairs(pList) do
           if stack then
             updateLine(statusPrefix..slot..statusSuffix)
-            insertLocation(pName, slot, getItemKey(stack), stack.count)
+            insertLocation(pName, slot, itemUtils.getItemKey(stack), stack.count)
           end
         end
         print()
@@ -178,7 +171,7 @@ eventHandler.schedule(function()
         local pName = import.pName
         local slot = import.slot
         local stack = import.stack
-        local key = getItemKey(stack)
+        local key = itemUtils.getItemKey(stack)
         local remaining = stack.count
 
         if items[key] then
@@ -242,7 +235,9 @@ eventHandler.schedule(function()
         }
 
         if packetN >= 50 then
+          -- TODO: Only send one packet
           netMan.sendToType("console", "itemsUpdate", packet)
+          netMan.sendToType("crafter", "itemsUpdate", packet)
           sleep(0)
           packetCount = packetCount + 1
           packetN = 0
@@ -251,7 +246,9 @@ eventHandler.schedule(function()
       end
 
       if packetN > 0 then
+        -- TODO: Only send one packet
         netMan.sendToType("console", "itemsUpdate", packet)
+        netMan.sendToType("crafter", "itemsUpdate", packet)
         sleep(0)
         packetCount = packetCount + 1
       end
