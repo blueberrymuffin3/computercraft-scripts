@@ -44,7 +44,7 @@ return {
       if peripheral.hasType(pName, "computer") then
         local targetLabel = peripheral.call(pName, "getLabel")
 
-        if targetLabel and string.find(targetLabel, protocolId) == 1 then
+        if targetLabel and string.find(targetLabel, networkId.."_"..targetType) == 1 then
           -- print("Waking up " .. targetLabel)
           peripheral.call(pName, "turnOn")
         end
@@ -55,7 +55,7 @@ return {
     rednet.broadcast({
       kind=kind,
       message=message,
-    }, protocolId)
+    }, networkId.."_"..targetType)
   end,
   addMessageHandler=function(handler)
     messageHandlers[handler] = true
