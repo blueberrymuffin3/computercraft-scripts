@@ -7,6 +7,7 @@ eventHandler.schedule(function()
   local taskStatus = require("taskStatus")
   local settingsUtil = require("settingsUtil")
   local checkForUpdate = require("update")
+  local itemsListener = require("itemsListener")
   checkForUpdate()
 
   local dropTarget
@@ -19,8 +20,6 @@ eventHandler.schedule(function()
     })
     dropTarget = settingsUtil.getRequired("ea.console.drop_target")
   end
-
-  local items = {}
 
   local function triggerDropAction(amount)
     return function(item)
@@ -54,13 +53,15 @@ eventHandler.schedule(function()
     end
   end
 
-  local function updateListView()
-    local itemsList = {}
-    for _, item in pairs(items) do
-      table.insert(itemsList, item)
+  eventHandler.addHandlerMap{
+    items_changed=function()
+      local itemsList = {}
+      for _, item in pairs(itemsListener.items) do
+        table.insert(itemsList, item)
+      end
+      homeListView.setList(itemsList)
     end
-    homeListView.setList(itemsList)
-  end
+  }
 
   local function renderListItem(item)
     local text = {item.total.." x "..item.details.displayName}
@@ -148,16 +149,6 @@ eventHandler.schedule(function()
   netMan.wakeupType("server")
   netMan.openAll()
   netMan.addMessageHandler(delegator{
-    itemsClear=function(message)
-      items = {}
-      updateListView()
-    end,
-    itemsUpdate=function(message)
-      for key, item in pairs(message) do
-        items[key] = item
-      end
-      updateListView()
-    end,
     reboot=function()
       term.clear()
       term.setCursorPos(1, 1)
@@ -166,7 +157,6 @@ eventHandler.schedule(function()
       os.reboot()
     end,
   }.handle)
-  netMan.sendToType("server", "refresh")
   homeListView.enableEvents()
 end)
 

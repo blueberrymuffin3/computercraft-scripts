@@ -59,6 +59,8 @@ local function runAsTask(name, action)
   end
 end
 
+eventHandler.schedule(sendTasks)
+
 return {
   runAsTask=runAsTask,
   wrap=function(name, action)

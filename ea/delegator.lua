@@ -1,8 +1,4 @@
-local nextId = 0
-
 return function(default)
-  local id = nextId
-  nextId = nextId + 1
   local handlerMaps = {}
 
   if default then
