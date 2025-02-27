@@ -6,6 +6,7 @@ eventHandler.schedule(function()
   local periodic = require("periodic")
   local taskStatus = require("taskStatus")
   local checkForUpdate = require("update")
+  local falliblePeripheral = require("falliblePeripheral")
 
   local items = {}
   local itemsDirtySet = {}
@@ -112,8 +113,7 @@ eventHandler.schedule(function()
         else
           table.insert(allStoragesLowPrio, pName)
         end
-        local pWrap = peripheral.wrap(pName)
-        local pList = pWrap.list()
+        local pList = falliblePeripheral.call(pName, "list")
         
         local statusSuffix = "/"..table.getn(pList)..")"
 
@@ -158,7 +158,7 @@ eventHandler.schedule(function()
       local thisRequestedExtraPersonalImports = requestedExtraPersonalImports
       requestedExtraPersonalImports = {}
       for pName, _ in pairs(thisRequestedExtraPersonalImports) do
-        local list = peripheral.call(pName, "list")
+        local list = falliblePeripheral.call(pName, "list")
         scanPeripheral(pName, list)
       end
 
@@ -166,7 +166,7 @@ eventHandler.schedule(function()
         local pMode = getPMode(pName)
 
         if pMode == "import" then
-          local list = peripheral.call(pName, "list")
+          local list = falliblePeripheral.call(pName, "list")
 
           scanPeripheral(pName, list)
         end
